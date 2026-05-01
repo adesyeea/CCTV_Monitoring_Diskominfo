@@ -1,0 +1,1937 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart CCTV - Jogja Smart Province</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --red: #cc2222;
+            --red-light: rgba(204, 34, 34, 0.08);
+            --red-border: rgba(204, 34, 34, 0.25);
+            --bg: #f5f6fa;
+            --surface: #ffffff;
+            --surface2: #f0f1f5;
+            --border: #e8e8ee;
+            --text: #1a1a2e;
+            --muted: #888899;
+            --muted2: #555566;
+            --green: #16a34a;
+            --green-light: rgba(22, 163, 74, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* TOPNAV */
+        .topnav {
+            background: var(--red);
+            height: 60px;
+            display: flex;
+            align-items: center;
+            padding: 0 28px;
+            position: sticky;
+            top: 0;
+            z-index: 200;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-right: 48px;
+        }
+
+        .nav-logo {
+            width: 36px;
+            height: 36px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .nav-logo img {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+        }
+
+        .nav-logo svg {
+            width: 20px;
+            height: 20px;
+            fill: white;
+        }
+
+        .nav-brand-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: white;
+            letter-spacing: 0.01em;
+        }
+
+        .nav-brand-sub {
+            font-size: 0.63rem;
+            color: rgba(255, 255, 255, 0.7);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex: 1;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 8px 16px;
+            font-size: 0.83rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.75);
+            cursor: pointer;
+            border-radius: 7px;
+            border: none;
+            background: none;
+            font-family: 'DM Sans', sans-serif;
+            white-space: nowrap;
+            position: relative;
+            transition: background 0.15s, color 0.15s;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: white;
+        }
+
+        .nav-link.active {
+            color: white;
+            font-weight: 600;
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -16px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70%;
+            height: 2px;
+            background: white;
+            border-radius: 2px;
+        }
+
+        .nav-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-chip {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 4px 12px 4px 4px;
+            border-radius: 100px;
+            background: rgba(255, 255, 255, 0.15);
+            transition: background 0.15s;
+        }
+
+        .user-chip:hover {
+            background: rgba(255, 255, 255, 0.22);
+        }
+
+        .user-avatar {
+            width: 30px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--red);
+        }
+
+        .user-name {
+            font-size: 0.8rem;
+            color: white;
+            font-weight: 500;
+        }
+
+        /* PAGES */
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* HOME */
+        .home-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 60px);
+            padding: 40px 24px;
+            text-align: center;
+        }
+
+        .home-emblem {
+            width: 100px;
+            height: 100px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+            margin-bottom: 28px;
+            overflow: hidden;
+        }
+
+        .home-emblem img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+        }
+
+        .home-emblem svg {
+            width: 56px;
+            height: 56px;
+        }
+
+        .home-title {
+            font-size: 1.45rem;
+            font-weight: 700;
+            color: var(--text);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 12px;
+        }
+
+        .home-desc {
+            color: var(--muted2);
+            font-size: 0.88rem;
+            line-height: 1.7;
+            max-width: 480px;
+            margin: 0 auto 32px;
+        }
+
+        .home-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 210px);
+            gap: 14px;
+            justify-content: center;
+        }
+
+        .home-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 22px 18px;
+            text-align: left;
+            cursor: pointer;
+            transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
+        }
+
+        .home-card:hover {
+            border-color: var(--red);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(204, 34, 34, 0.1);
+        }
+
+        .home-card-bar {
+            height: 3px;
+            width: 28px;
+            background: var(--red);
+            border-radius: 2px;
+            margin-bottom: 16px;
+        }
+
+        .home-card-title {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 5px;
+        }
+
+        .home-card-desc {
+            font-size: 0.74rem;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .home-footer {
+            margin-top: 32px;
+            font-size: 0.75rem;
+            color: var(--muted);
+        }
+
+        /* BREADCRUMB */
+        .breadcrumb {
+            padding: 11px 28px;
+            font-size: 0.76rem;
+            color: var(--muted);
+            border-bottom: 1px solid var(--border);
+            background: var(--surface);
+        }
+
+        .breadcrumb span {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        /* PAGE BODY */
+        .page-body {
+            padding: 22px 28px;
+        }
+
+        /* CCTV */
+        .cctv-header-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .cam-indicator {
+            width: 10px;
+            height: 10px;
+            background: var(--red);
+            border-radius: 50%;
+            flex-shrink: 0;
+            animation: pulse-r 1.4s ease infinite;
+        }
+
+        @keyframes pulse-r {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.3;
+            }
+        }
+
+        .cctv-cam-name {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 5px;
+        }
+
+        .cctv-cam-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .meta-chip {
+            font-size: 0.7rem;
+            color: var(--muted2);
+            background: var(--surface2);
+            padding: 3px 10px;
+            border-radius: 100px;
+            border: 1px solid var(--border);
+        }
+
+        .meta-chip.red {
+            background: var(--red-light);
+            color: var(--red);
+            border-color: var(--red-border);
+        }
+
+        .btn-back {
+            margin-left: auto;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 7px 16px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .btn-back:hover {
+            border-color: var(--red);
+            color: var(--red);
+        }
+
+        .cctv-grid {
+            display: grid;
+            grid-template-columns: 1fr 280px;
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+
+        .video-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .video-body {
+            background: #111;
+            aspect-ratio: 16/9;
+        }
+
+        .video-body video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .video-footer {
+            padding: 11px 16px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.73rem;
+            color: var(--muted);
+        }
+
+        .info-panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .info-panel-hdr {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.68rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.09em;
+            color: var(--muted);
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.79rem;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-key {
+            color: var(--muted);
+        }
+
+        .info-val {
+            font-weight: 600;
+            color: var(--text);
+            font-family: 'Space Mono', monospace;
+            font-size: 0.74rem;
+        }
+
+        .info-val.green {
+            color: var(--green);
+        }
+
+        .status-chip {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.74rem;
+            font-weight: 600;
+        }
+
+        .dot-green {
+            width: 7px;
+            height: 7px;
+            background: var(--green);
+            border-radius: 50%;
+            animation: pulse-g 2s ease infinite;
+        }
+
+        @keyframes pulse-g {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.3;
+            }
+        }
+
+        .session-bar {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+
+        .session-item {
+            flex: 1;
+            min-width: 100px;
+        }
+
+        .session-lbl {
+            font-size: 0.64rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--muted);
+            margin-bottom: 4px;
+        }
+
+        .session-val {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .session-clock {
+            background: var(--text);
+            color: white;
+            padding: 10px 18px;
+            border-radius: 8px;
+        }
+
+        .session-clock .session-lbl {
+            color: rgba(255, 255, 255, 0.55);
+        }
+
+        .session-clock .session-val {
+            color: white;
+        }
+
+        /* COUNTING */
+        .tab-bar {
+            display: flex;
+            gap: 2px;
+            background: var(--surface2);
+            border-radius: 8px;
+            padding: 3px;
+            margin-bottom: 20px;
+            width: fit-content;
+        }
+
+        .tab-btn {
+            padding: 7px 18px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border: none;
+            background: none;
+            cursor: pointer;
+            border-radius: 6px;
+            color: var(--muted2);
+            font-family: 'DM Sans', sans-serif;
+            transition: background 0.15s, color 0.15s;
+        }
+
+        .tab-btn.active {
+            background: var(--surface);
+            color: var(--red);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+        }
+
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        .kpi-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+
+        .kpi-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .kpi-icon-box {
+            width: 44px;
+            height: 44px;
+            border-radius: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .kpi-icon-box.green {
+            background: var(--green-light);
+        }
+
+        .kpi-icon-box.red {
+            background: var(--red-light);
+        }
+
+        .kpi-lbl {
+            font-size: 0.67rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--muted);
+            margin-bottom: 4px;
+        }
+
+        .kpi-val {
+            font-family: 'Space Mono', monospace;
+            font-size: 2rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .kpi-val.green {
+            color: var(--green);
+        }
+
+        .kpi-val.red {
+            color: var(--red);
+        }
+
+        .kpi-sub {
+            font-size: 0.71rem;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+
+        /* CHART CARDS */
+        .chart-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .chart-head {
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+        }
+
+        .chart-lbl {
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--muted);
+            margin-bottom: 2px;
+        }
+
+        .chart-ttl {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .chart-body {
+            padding: 18px;
+        }
+
+        .tag-red {
+            font-size: 0.65rem;
+            background: var(--red-light);
+            border: 1px solid var(--red-border);
+            color: var(--red);
+            padding: 2px 9px;
+            border-radius: 100px;
+            font-family: 'Space Mono', monospace;
+            white-space: nowrap;
+        }
+
+        .chart-full {
+            margin-bottom: 14px;
+        }
+
+        .charts-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+
+        .charts-side {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+
+        /* PEAK LIST */
+        .peak-list {
+            list-style: none;
+        }
+
+        .peak-item {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .peak-item:last-child {
+            border-bottom: none;
+        }
+
+        .pk-rank {
+            width: 20px;
+            height: 20px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.64rem;
+            font-weight: 700;
+            font-family: 'Space Mono', monospace;
+            flex-shrink: 0;
+        }
+
+        .pk-rank.r1 {
+            background: var(--red);
+            color: white;
+        }
+
+        .pk-rank.r2 {
+            background: var(--red-light);
+            color: var(--red);
+            border: 1px solid var(--red-border);
+        }
+
+        .pk-rank.r3 {
+            background: var(--red-light);
+            color: var(--red);
+            border: 1px solid rgba(204, 34, 34, 0.15);
+        }
+
+        .pk-rank.rn {
+            background: var(--surface2);
+            color: var(--muted);
+        }
+
+        .pk-time {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--text);
+            min-width: 48px;
+        }
+
+        .pk-bar-wrap {
+            flex: 1;
+        }
+
+        .pk-bar-bg {
+            background: var(--surface2);
+            border-radius: 3px;
+            height: 5px;
+            overflow: hidden;
+        }
+
+        .pk-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+            background: var(--red);
+            transition: width 0.6s ease;
+        }
+
+        .pk-count {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--red);
+            font-weight: 700;
+            min-width: 26px;
+            text-align: right;
+        }
+
+        /* VEHICLE GRID */
+        .veh-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .veh-item {
+            background: var(--surface2);
+            border-radius: 8px;
+            padding: 10px 13px;
+        }
+
+        .veh-lbl {
+            font-size: 0.62rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            margin-bottom: 3px;
+        }
+
+        .veh-val {
+            font-family: 'Space Mono', monospace;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .veh-sub {
+            font-size: 0.6rem;
+            color: var(--muted);
+            margin-top: 2px;
+        }
+
+        .veh-sub span {
+            color: var(--green);
+            font-weight: 600;
+        }
+
+        .veh-sub span.out {
+            color: var(--red);
+        }
+
+        /* HEATMAP */
+        .hm-grid {
+            display: grid;
+            grid-template-columns: repeat(24, 1fr);
+            gap: 3px;
+        }
+
+        .hm-cell {
+            aspect-ratio: 1;
+            border-radius: 3px;
+            background: var(--surface2);
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .hm-cell:hover {
+            transform: scale(1.2);
+            z-index: 5;
+            position: relative;
+        }
+
+        .hm-lbls {
+            display: grid;
+            grid-template-columns: repeat(24, 1fr);
+            gap: 3px;
+            margin-top: 4px;
+        }
+
+        .hm-lbl {
+            text-align: center;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.5rem;
+            color: var(--muted);
+        }
+
+        /* WEEK HEATMAP */
+        .week-hm-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+
+        .week-hm-cell {
+            border-radius: 6px;
+            padding: 10px 8px;
+            background: var(--surface2);
+            cursor: pointer;
+            transition: transform 0.1s;
+            text-align: center;
+        }
+
+        .week-hm-cell:hover {
+            transform: translateY(-2px);
+        }
+
+        .week-hm-day {
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 6px;
+        }
+
+        .week-hm-val {
+            font-family: 'Space Mono', monospace;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        /* STATUS */
+        .status-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-top: 12px;
+            font-size: 0.72rem;
+            color: var(--muted);
+        }
+
+        .st-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--green);
+            border-radius: 50%;
+            animation: pulse-g 2s infinite;
+            flex-shrink: 0;
+        }
+
+        /* TOOLTIP */
+        .tooltip-custom {
+            position: fixed;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--red);
+            border-radius: 6px;
+            padding: 7px 11px;
+            font-size: 0.72rem;
+            font-family: 'Space Mono', monospace;
+            color: var(--text);
+            pointer-events: none;
+            z-index: 1000;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.1s;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .filter-date-input {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            color: var(--text);
+            padding: 6px 12px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.76rem;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .filter-date-input:focus {
+            border-color: var(--red);
+        }
+
+        @media (max-width: 960px) {
+
+            .charts-2,
+            .charts-side,
+            .cctv-grid,
+            .home-cards,
+            .kpi-row {
+                grid-template-columns: 1fr;
+            }
+
+            .page-body {
+                padding: 16px;
+            }
+
+            .topnav {
+                padding: 0 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- TOPNAV -->
+    <nav class="topnav">
+        <div class="nav-brand">
+            <div class="nav-logo">
+                <img src="Coat_of_arms_of_Yogyakarta.png" alt="Logo">
+            </div>
+            <div>
+                <div class="nav-brand-title">Smart CCTV</div>
+                <div class="nav-brand-sub">Jogja Smart Province</div>
+            </div>
+        </div>
+
+        <div class="nav-links">
+            <button class="nav-link active" onclick="showPage('home', this)">Dashboard</button>
+            <button class="nav-link" onclick="showPage('cctv', this)">CCTV</button>
+            <button class="nav-link" onclick="showPage('counting', this)">Counting</button>
+        </div>
+    </nav>
+
+    <!-- HOME PAGE -->
+    <div id="homePage" class="page active">
+        <div class="home-wrap">
+            <div class="home-emblem">
+                <!-- Ganti dengan: <img src="logo.png"> -->
+                <img src="Coat_of_arms_of_Yogyakarta.png" alt="Logo">
+            </div>
+            <div class="home-title">Dashboard Monitoring CCTV</div>
+            <p class="home-desc">
+                Selamat datang di sistem <strong>Monitoring &amp; Analitik CCTV</strong> Jogja Smart Province.<br>
+                Pantau live streaming, analisis data kendaraan, dan identifikasi tren lalu lintas harian maupun
+                mingguan.
+            </p>
+            <div class="home-cards">
+                <div class="home-card" onclick="showPage('cctv', document.querySelectorAll('.nav-link')[1])">
+                    <div class="home-card-bar"></div>
+                    <div class="home-card-title">Live CCTV</div>
+                    <div class="home-card-desc">Pantau live streaming kamera Pertigaan Pasar Prambanan secara langsung.
+                    </div>
+                </div>
+                <div class="home-card" onclick="showPage('counting', document.querySelectorAll('.nav-link')[2])">
+                    <div class="home-card-bar"></div>
+                    <div class="home-card-title">Counting</div>
+                    <div class="home-card-desc">Analisis tren kepadatan per jam, per hari, dan distribusi tipe
+                        kendaraan.</div>
+                </div>
+                <div class="home-card" onclick="showPage('counting', document.querySelectorAll('.nav-link')[2])">
+                    <div class="home-card-bar"></div>
+                    <div class="home-card-title">Analitik Mingguan</div>
+                    <div class="home-card-desc">Lihat tren lalu lintas selama 7 hari terakhir dan identifikasi pola
+                        kepadatan.</div>
+                </div>
+            </div>
+            <div class="home-footer">Gunakan menu navigasi di atas untuk mulai menjelajahi sistem.</div>
+        </div>
+    </div>
+
+    <!-- CCTV PAGE -->
+    <div id="cctvPage" class="page">
+        <div class="breadcrumb">Live Monitoring / <span>Pertigaan_PasarPrambanan</span></div>
+        <div class="page-body">
+
+            <div class="cctv-header-card">
+                <div class="cam-indicator"></div>
+                <div style="flex:1;">
+                    <div class="cctv-cam-name">Pertigaan_PasarPrambanan</div>
+                    <div class="cctv-cam-meta">
+                        <div class="meta-chip">Dalam Kota</div>
+                        <div class="meta-chip"># CCTV</div>
+                        <div class="meta-chip red">Camera 142</div>
+                    </div>
+                </div>
+                <button class="btn-back" onclick="showPage('home', document.querySelectorAll('.nav-link')[0])">&#8592;
+                    Kembali</button>
+            </div>
+
+            <div class="cctv-grid">
+                <div class="video-card">
+                    <div class="video-body">
+                        <video controls autoplay muted playsinline>
+                            <source src="https://cctv.jogjaprov.go.id/cctv-proxy/atcs/Prambanan_TC.stream/playlist.m3u8"
+                                type="application/x-mpegURL">
+                        </video>
+                    </div>
+                    <div class="video-footer">
+                        <span>Prambanan TC Stream &middot; jogjaprov.go.id</span>
+                        <span id="cctv-time" style="font-family:'Space Mono',monospace;font-size:0.71rem;"></span>
+                    </div>
+                </div>
+
+                <div class="info-panel">
+                    <div class="info-panel-hdr">Informasi Kamera</div>
+                    <div class="info-row"><span class="info-key">ID Kamera</span><span class="info-val">CCTV</span>
+                    </div>
+                    <div class="info-row"><span class="info-key">Nama</span><span class="info-val"
+                            style="font-size:0.68rem;">Prambanan_TC</span></div>
+                    <div class="info-row"><span class="info-key">Lokasi</span><span class="info-val"
+                            style="font-size:0.7rem;">Dalam Kota</span></div>
+                    <div class="info-row"><span class="info-key">Tipe</span><span class="info-val">Traffic Count</span>
+                    </div>
+                    <div class="info-row"><span class="info-key">Status</span>
+                        <span class="status-chip">
+                            <span class="dot-green"></span>
+                            <span style="color:var(--green);font-size:0.74rem;font-weight:600;">Ready</span>
+                        </span>
+                    </div>
+                    <div class="info-row"><span class="info-key">AI Model</span><span
+                            class="info-val green">Aktif</span></div>
+                    <div class="info-row"><span class="info-key">Sumber</span><span class="info-val"
+                            style="font-size:0.68rem;">jogjaprov.go.id</span></div>
+                </div>
+            </div>
+
+            <div class="session-bar">
+                <div class="session-item">
+                    <div class="session-lbl">Sesi Dimulai</div>
+                    <div class="session-val" id="session-start">—</div>
+                </div>
+                <div class="session-clock">
+                    <div class="session-lbl">Waktu</div>
+                    <div class="session-val" id="session-clock-val">—</div>
+                </div>
+                <div class="session-item" style="text-align:right;">
+                    <div class="session-lbl">Durasi</div>
+                    <div class="session-val" id="session-duration">—</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- COUNTING PAGE -->
+    <div id="countingPage" class="page">
+        <div class="breadcrumb">Counting / <span>Pertigaan_PasarPrambanan</span></div>
+        <div class="page-body">
+
+            <div
+                style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px;">
+                <div>
+                    <div
+                        style="font-size:0.66rem;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--red);margin-bottom:3px;">
+                        Analitik</div>
+                    <div style="font-size:1.05rem;font-weight:700;color:var(--text);">Data Kendaraan &mdash; Prambanan
+                    </div>
+                </div>
+                <div id="filter-date-wrap" style="display:flex;align-items:center;gap:10px;">
+                    <label
+                        style="font-size:0.72rem;font-weight:600;color:var(--muted2);text-transform:uppercase;letter-spacing:0.08em;">Tanggal</label>
+                    <input type="date" id="filter-date" class="filter-date-input" onchange="fetchDayData()">
+                </div>
+            </div>
+
+            <div class="tab-bar">
+                <button class="tab-btn active" onclick="switchTab('harian', this)">Harian</button>
+                <button class="tab-btn" onclick="switchTab('mingguan', this)">Mingguan</button>
+            </div>
+
+            <!-- TAB HARIAN -->
+            <div id="tab-harian" class="tab-panel active">
+
+                <!-- [REVISI 1] Tombol Export Harian CSV dipindah ke sini -->
+                <div style="display:flex;justify-content:flex-end;margin-bottom:14px;">
+                    <button onclick="exportCSV('harian')"
+                        style="background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:7px 14px;font-size:0.78rem;font-weight:600;cursor:pointer;color:var(--text);font-family:'DM Sans',sans-serif;transition:all 0.15s;"
+                        onmouseover="this.style.borderColor='#cc2222';this.style.color='#cc2222'"
+                        onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)'">Export Harian
+                        CSV</button>
+                </div>
+
+                <div class="kpi-row">
+                    <div class="kpi-card">
+                        <div class="kpi-icon-box green">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="#16a34a">
+                                <path d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="kpi-lbl">Total Masuk</div>
+                            <div class="kpi-val green" id="kpi-masuk">0</div>
+                            <div class="kpi-sub" id="kpi-masuk-sub">—</div>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon-box red">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="#cc2222">
+                                <path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="kpi-lbl">Total Keluar</div>
+                            <div class="kpi-val red" id="kpi-keluar">0</div>
+                            <div class="kpi-sub" id="kpi-keluar-sub">—</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Line chart kepadatan - BESAR -->
+                <div class="chart-card chart-full">
+                    <div class="chart-head">
+                        <div>
+                            <div class="chart-lbl">Tren 24 Jam</div>
+                            <div class="chart-ttl">Kepadatan Kendaraan per Jam</div>
+                        </div>
+                        <div class="tag-red">Prambanan</div>
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="timeSeriesChart" height="45"></canvas>
+                    </div>
+                </div>
+
+                <!-- Bar chart masuk vs keluar per jam - BESAR -->
+                <div class="chart-card chart-full">
+                    <div class="chart-head">
+                        <div>
+                            <div class="chart-lbl">Perbandingan per Jam</div>
+                            <div class="chart-ttl">Masuk vs Keluar per Jam</div>
+                        </div>
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="inoutChart" height="45"></canvas>
+                    </div>
+                </div>
+
+                <!-- Peak hours + Donut kecil -->
+                <div class="charts-side">
+                    <div class="chart-card">
+                        <div class="chart-head">
+                            <div>
+                                <div class="chart-lbl">Analisis Waktu</div>
+                                <div class="chart-ttl">Top 5 Jam Tersibuk</div>
+                            </div>
+                        </div>
+                        <div class="chart-body" style="padding:10px 16px;">
+                            <ul class="peak-list" id="peak-list"></ul>
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <div class="chart-head">
+                            <div>
+                                <div class="chart-lbl">Komposisi</div>
+                                <div class="chart-ttl">Distribusi Tipe Kendaraan</div>
+                            </div>
+                        </div>
+                        <div class="chart-body"
+                            style="display:flex;align-items:center;justify-content:center;padding:10px;">
+                            <canvas id="donutChart" width="150" height="150"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detail kendaraan masuk vs keluar per tipe - BAR CHART BESAR -->
+                <div class="chart-card chart-full">
+                    <div class="chart-head">
+                        <div>
+                            <div class="chart-lbl">Detail Kendaraan</div>
+                            <div class="chart-ttl">Masuk vs Keluar per Tipe Kendaraan</div>
+                        </div>
+                    </div>
+                    <div class="chart-body"
+                        style="display:grid;grid-template-columns:220px 1fr;gap:20px;align-items:center;">
+                        <div class="veh-grid">
+                            <div class="veh-item">
+                                <div class="veh-lbl">Mobil</div>
+                                <div class="veh-val" id="v-car">0</div>
+                                <div class="veh-sub"><span id="v-car-m">0</span> masuk &middot; <span class="out"
+                                        id="v-car-k">0</span> keluar</div>
+                            </div>
+                            <div class="veh-item">
+                                <div class="veh-lbl">Motor</div>
+                                <div class="veh-val" id="v-moto">0</div>
+                                <div class="veh-sub"><span id="v-moto-m">0</span> masuk &middot; <span class="out"
+                                        id="v-moto-k">0</span> keluar</div>
+                            </div>
+                            <div class="veh-item">
+                                <div class="veh-lbl">Bus</div>
+                                <div class="veh-val" id="v-bus">0</div>
+                                <div class="veh-sub"><span id="v-bus-m">0</span> masuk &middot; <span class="out"
+                                        id="v-bus-k">0</span> keluar</div>
+                            </div>
+                            <div class="veh-item">
+                                <div class="veh-lbl">Truk</div>
+                                <div class="veh-val" id="v-truck">0</div>
+                                <div class="veh-sub"><span id="v-truck-m">0</span> masuk &middot; <span class="out"
+                                        id="v-truck-k">0</span> keluar</div>
+                            </div>
+                        </div>
+                        <canvas id="barChart" height="55"></canvas>
+                    </div>
+                </div>
+
+                <!-- Heatmap -->
+                <div class="chart-card chart-full">
+                    <div class="chart-head">
+                        <div>
+                            <div class="chart-lbl">Peta Kepadatan</div>
+                            <div class="chart-ttl">Heatmap Intensitas per Jam</div>
+                        </div>
+                    </div>
+                    <div class="chart-body">
+                        <div class="hm-grid" id="hm-grid"></div>
+                        <div class="hm-lbls" id="hm-lbls"></div>
+                        <div style="display:flex;align-items:center;gap:7px;margin-top:10px;">
+                            <span style="font-size:0.64rem;color:var(--muted);">Sepi</span>
+                            <div
+                                style="height:6px;width:80px;border-radius:3px;background:linear-gradient(90deg,#f0f1f5,#cc2222);">
+                            </div>
+                            <span style="font-size:0.64rem;color:var(--muted);">Padat</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- TAB MINGGUAN -->
+            <div id="tab-mingguan" class="tab-panel">
+
+                <!-- [REVISI 2] Filter rentang tanggal dipindah ke dalam tab, tanpa tombol Export Harian CSV -->
+                <div
+                    style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 18px;">
+                    <label
+                        style="font-size:0.72rem;font-weight:600;color:var(--muted2);text-transform:uppercase;letter-spacing:0.08em;">Rentang
+                        Tanggal</label>
+                    <input type="date" id="week-date-from" class="filter-date-input" onchange="fetchRangeData()">
+                    <span style="font-size:0.78rem;color:var(--muted);">s/d</span>
+                    <input type="date" id="week-date-to" class="filter-date-input" onchange="fetchRangeData()">
+                    <span id="week-range-info"
+                        style="font-size:0.72rem;color:var(--muted);font-family:'Space Mono',monospace;"></span>
+                    <div style="margin-left:auto;">
+                        <button onclick="exportCSV('rentang')"
+                            style="background:#cc2222;border:none;border-radius:7px;padding:7px 14px;font-size:0.78rem;font-weight:600;cursor:pointer;color:white;font-family:'DM Sans',sans-serif;transition:background 0.15s;"
+                            onmouseover="this.style.background='#aa1a1a'"
+                            onmouseout="this.style.background='#cc2222'">Export Rentang CSV</button>
+                    </div>
+                </div>
+
+                <div class="kpi-row" style="margin-bottom:18px;">
+                    <div class="kpi-card">
+                        <div class="kpi-icon-box green">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="#16a34a">
+                                <path d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="kpi-lbl">Total Masuk (Rentang)</div>
+                            <div class="kpi-val green" id="kpi-week-masuk">0</div>
+                            <div class="kpi-sub" id="kpi-week-masuk-sub">—</div>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon-box red">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="#cc2222">
+                                <path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="kpi-lbl">Total Keluar (Rentang)</div>
+                            <div class="kpi-val red" id="kpi-week-keluar">0</div>
+                            <div class="kpi-sub" id="kpi-week-keluar-sub">—</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tren per hari - BESAR -->
+                <div class="chart-card chart-full">
+                    <div class="chart-head">
+                        <div>
+                            <div class="chart-lbl">Tren Rentang Tanggal</div>
+                            <div class="chart-ttl" id="week-trend-title">Total Kendaraan per Hari</div>
+                        </div>
+                        <div class="tag-red">Prambanan</div>
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="weekTrendChart" height="45"></canvas>
+                    </div>
+                </div>
+
+                <!-- Masuk vs keluar per hari - BESAR -->
+                <div class="chart-card chart-full">
+                    <div class="chart-head">
+                        <div>
+                            <div class="chart-lbl">Perbandingan Harian</div>
+                            <div class="chart-ttl">Masuk vs Keluar per Hari</div>
+                        </div>
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="weekInOutChart" height="45"></canvas>
+                    </div>
+                </div>
+
+                <!-- Hari tersibuk + rata-rata -->
+                <div class="charts-2">
+                    <div class="chart-card">
+                        <div class="chart-head">
+                            <div>
+                                <div class="chart-lbl">Analisis Hari</div>
+                                <div class="chart-ttl">Hari Tersibuk dalam Seminggu</div>
+                            </div>
+                        </div>
+                        <div class="chart-body" style="padding:10px 16px;">
+                            <ul class="peak-list" id="peak-day-list"></ul>
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <div class="chart-head">
+                            <div>
+                                <div class="chart-lbl">Rata-rata</div>
+                                <div class="chart-ttl">Rata-rata Kendaraan per Hari</div>
+                            </div>
+                        </div>
+                        <div class="chart-body">
+                            <canvas id="avgDayChart" height="160"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Week heatmap -->
+                <div class="chart-card chart-full">
+                    <div class="chart-head">
+                        <div>
+                            <div class="chart-lbl">Peta Kepadatan Mingguan</div>
+                            <div class="chart-ttl">Intensitas Lalu Lintas per Hari</div>
+                        </div>
+                    </div>
+                    <div class="chart-body">
+                        <div class="week-hm-grid" id="week-hm-grid"></div>
+                        <div style="display:flex;align-items:center;gap:7px;margin-top:12px;">
+                            <span style="font-size:0.64rem;color:var(--muted);">Sepi</span>
+                            <div
+                                style="height:6px;width:80px;border-radius:3px;background:linear-gradient(90deg,#f0f1f5,#cc2222);">
+                            </div>
+                            <span style="font-size:0.64rem;color:var(--muted);">Padat</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="status-row">
+                <div class="st-dot"></div>
+                <span>Terhubung ke server lokal</span>
+                <span>|</span>
+                <span>Auto-refresh setiap 3 detik</span>
+                <span>|</span>
+                <span id="status-time">—</span>
+                <span style="margin-left:auto;font-family:'Space Mono',monospace;font-size:0.68rem;">CCTV &middot;
+                    Prambanan</span>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="tooltip-custom" id="tooltip"></div>
+
+    <script>
+        const RED = '#cc2222';
+        const RED_LIGHT = 'rgba(204,34,34,0.1)';
+        const RED_MID = 'rgba(204,34,34,0.55)';
+        const GREEN = '#16a34a';
+        const GREEN_LIGHT = 'rgba(22,163,74,0.1)';
+
+        let charts = {};
+        const tooltipCfg = {
+            backgroundColor: '#fff', borderColor: '#e8e8ee', borderWidth: 1,
+            titleColor: '#888', bodyColor: '#1a1a2e', padding: 10
+        };
+
+        // SESSION CLOCK
+        const sessionStart = new Date();
+        function padZ(n) { return String(n).padStart(2, '0'); }
+        function fmtDate(d) {
+            return `${padZ(d.getDate())}/${padZ(d.getMonth() + 1)}/${d.getFullYear()}, ${padZ(d.getHours())}.${padZ(d.getMinutes())}.${padZ(d.getSeconds())}`;
+        }
+        function tickClock() {
+            const now = new Date();
+            setText('session-clock-val', fmtDate(now));
+            setText('session-start', fmtDate(sessionStart));
+            setText('cctv-time', fmtDate(now));
+            const diff = Math.floor((now - sessionStart) / 1000);
+            setText('session-duration', `${padZ(Math.floor(diff / 60))}:${padZ(diff % 60)}`);
+        }
+        setInterval(tickClock, 1000);
+        tickClock();
+
+        // PAGE NAV
+        function showPage(page, btn) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            document.getElementById(page + 'Page').classList.add('active');
+            if (btn) btn.classList.add('active');
+            if (page === 'counting') { fetchDayData(); fetchRangeData(); }
+        }
+
+        // TABS
+        function switchTab(tab, btn) {
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('tab-' + tab).classList.add('active');
+            btn.classList.add('active');
+
+            const filterWrap = document.getElementById('filter-date')?.closest('div[style]');
+            if (filterWrap) filterWrap.style.display = tab === 'mingguan' ? 'none' : 'flex';
+        }
+
+        // HEATMAP INIT
+        function initHeatmap() {
+            const grid = document.getElementById('hm-grid');
+            const lbls = document.getElementById('hm-lbls');
+            if (!grid) return;
+            grid.innerHTML = ''; lbls.innerHTML = '';
+            for (let h = 0; h < 24; h++) {
+                const cell = document.createElement('div');
+                cell.className = 'hm-cell'; cell.id = `hm-${h}`;
+                grid.appendChild(cell);
+                const lbl = document.createElement('div');
+                lbl.className = 'hm-lbl';
+                lbl.textContent = h % 3 === 0 ? `${h}` : '';
+                lbls.appendChild(lbl);
+            }
+        }
+
+        function updateHeatmap(hourly) {
+            const max = Math.max(...hourly, 1);
+            for (let h = 0; h < 24; h++) {
+                const cell = document.getElementById(`hm-${h}`);
+                if (!cell) continue;
+                const r = hourly[h] / max;
+                const gv = Math.round(255 - r * 221), bv = Math.round(255 - r * 221);
+                cell.style.background = r < 0.04 ? '#f0f1f5' : `rgb(255,${gv},${bv})`;
+                const cnt = hourly[h];
+                cell.onmouseenter = (e) => showTip(e, `${padZ(h)}:00 - ${padZ(h + 1)}:00`, cnt);
+                cell.onmouseleave = hideTip;
+            }
+        }
+
+        function updateWeekHeatmap(weekData, labels) {
+            const grid = document.getElementById('week-hm-grid');
+            if (!grid) return;
+            const max = Math.max(...weekData, 1);
+            grid.innerHTML = '';
+            weekData.forEach((val, i) => {
+                const r = val / max;
+                const gv = Math.round(255 - r * 221), bv = Math.round(255 - r * 221);
+                const bg = r < 0.04 ? '#f0f1f5' : `rgb(255,${gv},${bv})`;
+                const textCol = r > 0.5 ? 'white' : 'var(--text)';
+                const lblCol = r > 0.5 ? 'rgba(255,255,255,0.7)' : 'var(--muted)';
+                const cell = document.createElement('div');
+                cell.className = 'week-hm-cell';
+                cell.style.background = bg;
+                cell.innerHTML = `<div class="week-hm-day" style="color:${lblCol}">${labels[i]}</div><div class="week-hm-val" style="color:${textCol}">${val}</div>`;
+                cell.onmouseenter = (e) => showTip(e, labels[i], val);
+                cell.onmouseleave = hideTip;
+                grid.appendChild(cell);
+            });
+        }
+
+        function showTip(e, label, count) {
+            const t = document.getElementById('tooltip');
+            t.innerHTML = `<b>${label}</b><br>${count} kendaraan`;
+            t.style.opacity = '1';
+            document.onmousemove = (ev) => { t.style.left = (ev.clientX + 14) + 'px'; t.style.top = (ev.clientY - 10) + 'px'; };
+            t.style.left = (e.clientX + 14) + 'px'; t.style.top = (e.clientY - 10) + 'px';
+        }
+        function hideTip() { document.getElementById('tooltip').style.opacity = '0'; document.onmousemove = null; }
+
+        // HELPERS
+        function animNum(id, target) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            const start = parseInt(el.textContent) || 0, t0 = performance.now();
+            const step = now => {
+                const p = Math.min((now - t0) / 500, 1);
+                el.textContent = Math.round(start + (target - start) * p);
+                if (p < 1) requestAnimationFrame(step);
+            };
+            requestAnimationFrame(step);
+        }
+        function setText(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
+
+        // DATE FILTER
+        const dateEl = document.getElementById('filter-date');
+        if (dateEl) dateEl.valueAsDate = new Date();
+
+        // DAILY DATA
+        async function fetchDayData() {
+            const date = dateEl ? dateEl.value : new Date().toISOString().split('T')[0];
+            try {
+                const res = await fetch(`http://127.0.0.1:5000/api/traffic?date=${date}`);
+                const json = await res.json();
+                if (json.status === 'success') { lastDayRawData = json.data; processDayData(json.data); }
+            } catch (err) { console.warn('Server tidak tersedia:', err); }
+            setText('status-time', 'Diperbarui: ' + new Date().toLocaleTimeString('id-ID'));
+        }
+
+        function generateDummy() {
+            const pattern = [2, 1, 1, 1, 2, 5, 12, 22, 35, 48, 80, 104, 72, 56, 44, 38, 30, 42, 38, 28, 18, 12, 8, 4];
+            const data = [];
+            ['car', 'motorcycle', 'bus', 'truck'].forEach((t, i) => {
+                const r = [0.45, 0.3, 0.04, 0.21][i];
+                for (let h = 0; h < 24; h++) {
+                    const cnt = Math.ceil(pattern[h] * r);
+                    if (cnt > 0) data.push({ device_id: 'CCTV', object: t, hour: h, masuk: Math.round(cnt * 0.77), keluar: Math.ceil(cnt * 0.23) });
+                }
+            });
+            processDayData(data);
+        }
+
+        function processDayData(data) {
+            let totalM = 0, totalK = 0;
+            const hourly = Array(24).fill(0), hM = Array(24).fill(0), hK = Array(24).fill(0);
+            const veh = {
+                car_m: 0, car_k: 0,
+                motorcycle_m: 0, motorcycle_k: 0,
+                bus_m: 0, bus_k: 0,
+                truck_m: 0, truck_k: 0
+            };
+
+            data.forEach(item => {
+                const m = parseInt(item.masuk), k = parseInt(item.keluar), h = item.hour;
+                totalM += m; totalK += k;
+                hourly[h] += m + k; hM[h] += m; hK[h] += k;
+                if (veh[item.object + '_m'] !== undefined) {
+                    veh[item.object + '_m'] += m;
+                    veh[item.object + '_k'] += k;
+                }
+            });
+
+            const total = totalM + totalK;
+            animNum('kpi-masuk', totalM);
+            animNum('kpi-keluar', totalK);
+            setText('kpi-masuk-sub', `${((totalM / Math.max(total, 1)) * 100).toFixed(1)}% dari total lalu lintas`);
+            setText('kpi-keluar-sub', `${((totalK / Math.max(total, 1)) * 100).toFixed(1)}% dari total lalu lintas`);
+
+            // Update vehicle cards
+            const types = ['car', 'motorcycle', 'bus', 'truck'];
+            const ids = ['car', 'moto', 'bus', 'truck'];
+            types.forEach((t, i) => {
+                const tot = veh[t + '_m'] + veh[t + '_k'];
+                setText('v-' + ids[i], tot);
+                setText('v-' + ids[i] + '-m', veh[t + '_m']);
+                setText('v-' + ids[i] + '-k', veh[t + '_k']);
+            });
+
+            updatePeakList(hourly);
+            updateHeatmap(hourly);
+            drawTimeSeries(hourly);
+            drawInOut(hM, hK);
+            drawDonut(veh);
+            drawBar(veh);
+        }
+
+        // RANGE DATA
+        let lastRangeRawData = [];
+        let lastDayRawData = [];
+
+        // Init default rentang: 7 hari terakhir
+        function initRangeDates() {
+            const today = new Date();
+            const from = new Date(today);
+            from.setDate(today.getDate() - 6);
+            document.getElementById('week-date-from').value = from.toISOString().split('T')[0];
+            document.getElementById('week-date-to').value = today.toISOString().split('T')[0];
+        }
+
+        async function fetchRangeData() {
+            const fromEl = document.getElementById('week-date-from');
+            const toEl = document.getElementById('week-date-to');
+            if (!fromEl || !toEl) return;
+
+            const fromDate = new Date(fromEl.value);
+            const toDate = new Date(toEl.value);
+            if (isNaN(fromDate) || isNaN(toDate) || fromDate > toDate) {
+                setText('week-range-info', 'Tanggal tidak valid');
+                return;
+            }
+
+            // Buat array tanggal
+            const dates = [], labels = [];
+            const days = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+            for (let d = new Date(fromDate); d <= toDate; d.setDate(d.getDate() + 1)) {
+                dates.push(d.toISOString().split('T')[0]);
+                labels.push(days[d.getDay()] + ' ' + padZ(d.getDate()) + '/' + padZ(d.getMonth() + 1));
+            }
+
+            const n = dates.length;
+            setText('week-range-info', `${n} hari dipilih`);
+            setText('week-trend-title', `Total Kendaraan per Hari (${n} Hari)`);
+
+            let weekTotal = [], weekMasuk = [], weekKeluar = [];
+            lastRangeRawData = [];
+
+            const results = await Promise.all(dates.map(async (date, i) => {
+                try {
+                    const res = await fetch(`http://127.0.0.1:5000/api/traffic?date=${date}`);
+                    const json = await res.json();
+                    if (json.status === 'success') {
+                        let m = 0, k = 0;
+                        json.data.forEach(item => { m += parseInt(item.masuk); k += parseInt(item.keluar); });
+                        return { m, k, date, label: labels[i] };
+                    }
+                } catch { }
+                return { m: 0, k: 0, date, label: labels[i] };
+            }));
+
+            results.forEach(r => {
+                weekMasuk.push(r.m);
+                weekKeluar.push(r.k);
+                weekTotal.push(r.m + r.k);
+                lastRangeRawData.push({ tanggal: r.date, hari: r.label, masuk: r.m, keluar: r.k, total: r.m + r.k });
+            });
+
+            processWeekData(weekTotal, weekMasuk, weekKeluar, labels, n);
+        }
+
+        function processWeekData(total, masuk, keluar, labels, n) {
+            const totalM = masuk.reduce((a, b) => a + b, 0);
+            const totalK = keluar.reduce((a, b) => a + b, 0);
+            animNum('kpi-week-masuk', totalM);
+            animNum('kpi-week-keluar', totalK);
+            setText('kpi-week-masuk-sub', `Akumulasi ${n} hari`);
+            setText('kpi-week-keluar-sub', `Akumulasi ${n} hari`);
+            drawWeekTrend(total, labels);
+            drawWeekInOut(masuk, keluar, labels);
+            drawPeakDayList(total, labels);
+            drawAvgDay(total, labels);
+            updateWeekHeatmap(total, labels);
+        }
+
+        // EXPORT CSV
+        function exportCSV(mode) {
+            let rows = [], filename = '';
+
+            if (mode === 'harian') {
+                filename = `data_harian_${document.getElementById('filter-date')?.value || 'hari_ini'}.csv`;
+                rows.push(['Jam', 'Total', 'Masuk', 'Keluar']);
+                const hourly = Array(24).fill(0);
+                const hourlyM = Array(24).fill(0);
+                const hourlyK = Array(24).fill(0);
+                lastDayRawData.forEach(item => {
+                    const m = parseInt(item.masuk), k = parseInt(item.keluar), h = item.hour;
+                    hourly[h] += m + k;
+                    hourlyM[h] += m;
+                    hourlyK[h] += k;
+                });
+                for (let h = 0; h < 24; h++) {
+                    rows.push([`${padZ(h)}:00`, hourly[h], hourlyM[h], hourlyK[h]]);
+                }
+                rows.push([]);
+                rows.push(['Tipe Kendaraan', 'Total', 'Masuk', 'Keluar']);
+                const veh = { car: { m: 0, k: 0 }, motorcycle: { m: 0, k: 0 }, bus: { m: 0, k: 0 }, truck: { m: 0, k: 0 } };
+                lastDayRawData.forEach(item => {
+                    if (veh[item.object]) {
+                        veh[item.object].m += parseInt(item.masuk);
+                        veh[item.object].k += parseInt(item.keluar);
+                    }
+                });
+                [['Mobil', 'car'], ['Motor', 'motorcycle'], ['Bus', 'bus'], ['Truk', 'truck']].forEach(([label, key]) => {
+                    const m = veh[key].m, k = veh[key].k;
+                    rows.push([label, m + k, m, k]);
+                });
+
+            } else {
+                const from = document.getElementById('week-date-from')?.value || '';
+                const to = document.getElementById('week-date-to')?.value || '';
+                filename = `data_rentang_${from}_sd_${to}.csv`;
+                rows.push(['Tanggal', 'Hari', 'Total', 'Masuk', 'Keluar']);
+                lastRangeRawData.forEach(r => {
+                    rows.push([r.tanggal, r.hari, r.total, r.masuk, r.keluar]);
+                });
+                const sumM = lastRangeRawData.reduce((a, r) => a + r.masuk, 0);
+                const sumK = lastRangeRawData.reduce((a, r) => a + r.keluar, 0);
+                rows.push([]);
+                rows.push(['TOTAL', '', sumM + sumK, sumM, sumK]);
+            }
+
+            const csv = rows.map(r => r.join(',')).join('\n');
+            const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // CHART FUNCTIONS
+        function updatePeakList(hourly) {
+            const sorted = hourly.map((v, h) => ({ h, v })).sort((a, b) => b.v - a.v).slice(0, 5);
+            const max = sorted[0]?.v || 1;
+            const rc = ['r1', 'r2', 'r3', 'rn', 'rn'];
+            const el = document.getElementById('peak-list');
+            if (!el) return;
+            el.innerHTML = sorted.map((item, i) => `
+        <li class="peak-item">
+            <div class="pk-rank ${rc[i]}">${i + 1}</div>
+            <div class="pk-time">${padZ(item.h)}:00</div>
+            <div class="pk-bar-wrap"><div class="pk-bar-bg"><div class="pk-bar-fill" style="width:${(item.v / max * 100).toFixed(1)}%"></div></div></div>
+            <div class="pk-count">${item.v}</div>
+        </li>`).join('');
+        }
+
+        function drawPeakDayList(total, labels) {
+            const sorted = total.map((v, i) => ({ i, v, l: labels[i] })).sort((a, b) => b.v - a.v);
+            const max = sorted[0]?.v || 1;
+            const rc = ['r1', 'r2', 'r3', 'rn', 'rn', 'rn', 'rn'];
+            const el = document.getElementById('peak-day-list');
+            if (!el) return;
+            el.innerHTML = sorted.map((item, i) => `
+        <li class="peak-item">
+            <div class="pk-rank ${rc[i]}">${i + 1}</div>
+            <div class="pk-time" style="min-width:80px;font-size:0.74rem;">${item.l}</div>
+            <div class="pk-bar-wrap"><div class="pk-bar-bg"><div class="pk-bar-fill" style="width:${(item.v / max * 100).toFixed(1)}%"></div></div></div>
+            <div class="pk-count">${item.v}</div>
+        </li>`).join('');
+        }
+
+        function drawTimeSeries(hourly) {
+            const ctx = document.getElementById('timeSeriesChart')?.getContext('2d');
+            if (!ctx) return;
+            const labels = Array.from({ length: 24 }, (_, i) => `${padZ(i)}:00`);
+            if (charts.ts) { charts.ts.data.datasets[0].data = hourly; charts.ts.update('active'); return; }
+            charts.ts = new Chart(ctx, {
+                type: 'line',
+                data: { labels, datasets: [{ label: 'Total', data: hourly, borderColor: RED, backgroundColor: RED_LIGHT, fill: true, tension: 0.4, pointRadius: 3, pointBackgroundColor: RED, pointHoverRadius: 5, borderWidth: 2 }] },
+                options: { responsive: true, plugins: { legend: { display: false }, tooltip: { ...tooltipCfg, callbacks: { label: c => ` ${c.parsed.y} kendaraan` } } }, scales: { x: { grid: { color: '#f0f0f5' }, ticks: { color: '#aaa', font: { size: 9, family: 'Space Mono' }, maxTicksLimit: 8 } }, y: { grid: { color: '#f0f0f5' }, ticks: { color: '#aaa', font: { size: 9 } }, beginAtZero: true } } }
+            });
+        }
+
+        function drawInOut(masuk, keluar) {
+            const ctx = document.getElementById('inoutChart')?.getContext('2d');
+            if (!ctx) return;
+            const labels = Array.from({ length: 24 }, (_, i) => `${padZ(i)}`);
+            if (charts.io) { charts.io.data.datasets[0].data = masuk; charts.io.data.datasets[1].data = keluar; charts.io.update(); return; }
+            charts.io = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels, datasets: [
+                        { label: 'Masuk', data: masuk, backgroundColor: RED_MID, borderRadius: 2, borderSkipped: false },
+                        { label: 'Keluar', data: keluar, backgroundColor: '#cccccc', borderRadius: 2, borderSkipped: false }
+                    ]
+                },
+                options: { responsive: true, plugins: { legend: { labels: { color: '#888', font: { size: 10 }, boxWidth: 10 } }, tooltip: tooltipCfg }, scales: { x: { stacked: true, grid: { display: false }, ticks: { color: '#aaa', font: { size: 8, family: 'Space Mono' }, maxTicksLimit: 12 } }, y: { stacked: true, grid: { color: '#f0f0f5' }, ticks: { color: '#aaa', font: { size: 9 } }, beginAtZero: true } } }
+            });
+        }
+
+        function drawDonut(veh) {
+            const ctx = document.getElementById('donutChart')?.getContext('2d');
+            if (!ctx) return;
+            const vals = [
+                veh.car_m + veh.car_k,
+                veh.motorcycle_m + veh.motorcycle_k,
+                veh.bus_m + veh.bus_k,
+                veh.truck_m + veh.truck_k
+            ];
+            if (charts.dn) { charts.dn.data.datasets[0].data = vals; charts.dn.update(); return; }
+            charts.dn = new Chart(ctx, {
+                type: 'doughnut',
+                data: { labels: ['Mobil', 'Motor', 'Bus', 'Truk'], datasets: [{ data: vals, backgroundColor: ['#cc2222', '#e07070', '#f0b0b0', '#cccccc'], borderColor: '#fff', borderWidth: 2, hoverOffset: 3 }] },
+                options: { cutout: '68%', plugins: { legend: { position: 'bottom', labels: { color: '#555', font: { size: 9 }, padding: 8, boxWidth: 9 } }, tooltip: tooltipCfg } }
+            });
+        }
+
+        function drawBar(veh) {
+            const ctx = document.getElementById('barChart')?.getContext('2d');
+            if (!ctx) return;
+            const masukVals = [veh.car_m, veh.motorcycle_m, veh.bus_m, veh.truck_m];
+            const keluarVals = [veh.car_k, veh.motorcycle_k, veh.bus_k, veh.truck_k];
+            if (charts.br) {
+                charts.br.data.datasets[0].data = masukVals;
+                charts.br.data.datasets[1].data = keluarVals;
+                charts.br.update(); return;
+            }
+            charts.br = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Mobil', 'Motor', 'Bus', 'Truk'], datasets: [
+                        { label: 'Masuk', data: masukVals, backgroundColor: RED_MID, borderRadius: 4, borderSkipped: false },
+                        { label: 'Keluar', data: keluarVals, backgroundColor: '#cccccc', borderRadius: 4, borderSkipped: false }
+                    ]
+                },
+                options: { responsive: true, plugins: { legend: { labels: { color: '#888', font: { size: 10 }, boxWidth: 10 } }, tooltip: tooltipCfg }, scales: { x: { grid: { display: false }, ticks: { color: '#aaa', font: { size: 10 } } }, y: { grid: { color: '#f0f0f5' }, ticks: { color: '#aaa', font: { size: 9 } }, beginAtZero: true } } }
+            });
+        }
+
+        function drawWeekTrend(total, labels) {
+            const ctx = document.getElementById('weekTrendChart')?.getContext('2d');
+            if (!ctx) return;
+            if (charts.wt) { charts.wt.data.labels = labels; charts.wt.data.datasets[0].data = total; charts.wt.update(); return; }
+            charts.wt = new Chart(ctx, {
+                type: 'line',
+                data: { labels, datasets: [{ label: 'Total', data: total, borderColor: RED, backgroundColor: RED_LIGHT, fill: true, tension: 0.3, pointRadius: 5, pointBackgroundColor: RED, pointHoverRadius: 7, borderWidth: 2.5 }] },
+                options: { responsive: true, plugins: { legend: { display: false }, tooltip: { ...tooltipCfg, callbacks: { label: c => ` ${c.parsed.y} kendaraan` } } }, scales: { x: { grid: { color: '#f0f0f5' }, ticks: { color: '#aaa', font: { size: 9, family: 'Space Mono' } } }, y: { grid: { color: '#f0f0f5' }, ticks: { color: '#aaa', font: { size: 9 } }, beginAtZero: true } } }
+            });
+        }
+
+        function drawWeekInOut(masuk, keluar, labels) {
+            const ctx = document.getElementById('weekInOutChart')?.getContext('2d');
+            if (!ctx) return;
+            if (charts.wio) { charts.wio.data.labels = labels; charts.wio.data.datasets[0].data = masuk; charts.wio.data.datasets[1].data = keluar; charts.wio.update(); return; }
+            charts.wio = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels, datasets: [
+                        { label: 'Masuk', data: masuk, backgroundColor: RED_MID, borderRadius: 4, borderSkipped: false },
+                        { label: 'Keluar', data: keluar, backgroundColor: '#cccccc', borderRadius: 4, borderSkipped: false }
+                    ]
+                },
+                options: { responsive: true, plugins: { legend: { labels: { color: '#888', font: { size: 10 }, boxWidth: 10 } }, tooltip: tooltipCfg }, scales: { x: { stacked: true, grid: { display: false }, ticks: { color: '#aaa', font: { size: 9, family: 'Space Mono' } } }, y: { stacked: true, grid: { color: '#f0f0f5' }, ticks: { color: '#aaa', font: { size: 9 } }, beginAtZero: true } } }
+            });
+        }
+
+        function drawAvgDay(total, labels) {
+            const ctx = document.getElementById('avgDayChart')?.getContext('2d');
+            if (!ctx) return;
+            const avg = total.map(v => Math.round(v / 24));
+            const maxVal = Math.max(...total);
+            if (charts.avg) { charts.avg.data.labels = labels; charts.avg.data.datasets[0].data = avg; charts.avg.update(); return; }
+            charts.avg = new Chart(ctx, {
+                type: 'bar',
+                data: { labels, datasets: [{ label: 'Rata-rata/jam', data: avg, backgroundColor: total.map(v => v === maxVal ? RED : 'rgba(204,34,34,0.25)'), borderRadius: 4, borderSkipped: false }] },
+                options: { responsive: true, plugins: { legend: { display: false }, tooltip: { ...tooltipCfg, callbacks: { label: c => ` ${c.parsed.y} kend/jam` } } }, scales: { x: { grid: { display: false }, ticks: { color: '#aaa', font: { size: 8, family: 'Space Mono' } } }, y: { grid: { color: '#f0f0f5' }, ticks: { color: '#aaa', font: { size: 9 } }, beginAtZero: true } } }
+            });
+        }
+
+        // INIT
+        initHeatmap();
+        initRangeDates();
+        fetchDayData();
+        fetchRangeData();
+
+        setInterval(() => {
+            const today = new Date().toISOString().split('T')[0];
+            if (dateEl && dateEl.value === today && document.getElementById('countingPage').classList.contains('active')) {
+                fetchDayData();
+            }
+        }, 3000);
+    </script>
+</body>
+
+</html>

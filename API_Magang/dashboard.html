@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard ATCS CCTV DIY</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        body {
+            background-color: #f4f7f6;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .card {
+            border-radius: 15px;
+            border: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        .card-header {
+            font-size: 1.1rem;
+            border: none;
+            font-weight: bold;
+        }
+
+        .header-title {
+            color: #2c3e50;
+            font-weight: bold;
+        }
+
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 0;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: #6c757d;
+            font-weight: 600;
+        }
+
+        .live-badge {
+            animation: blinker 1.5s linear infinite;
+            background-color: #dc3545;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        @keyframes blinker {
+            50% {
+                opacity: 0;
+            }
+        }
+
+        .btn-excel {
+            background-color: #1d6f42;
+            color: white;
+            border-radius: 20px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .btn-excel:hover {
+            background-color: #145532;
+            color: white;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container mt-4">
+        <div class="row mb-4 align-items-center">
+            <div class="col-md-6">
+                <h2 class="header-title">Sistem Monitoring Kendaraan DIY</h2>
+                <p class="text-muted mb-0" id="tanggal-update">Menghubungkan ke API Python...</p>
+            </div>
+            <div class="col-md-6 text-end">
+                <button class="btn btn-excel me-2" onclick="downloadExcel()"> Unduh Laporan Excel</button>
+                <span class="live-badge">🔴 LIVE MONITORING</span>
+            </div>
+        </div>
+
+        <div class="row" id="charts-container">
+        </div>
+    </div>
+
+    <script>
+        let charts = {};
+        let rawDataForExcel = [];
+
+        // Mapping ID CCTV ke Nama Lokasi yang lebih manusiawi
+        const namaLokasiMap = {
+            "CCTV1": "Demen Glagah",
+            "CCTV2": "Prambanan",
+            "CCTV3": "Tugu Selamat Datang Patuk",
+            "CCTV4": "Perempatan Beran"
+        };
+
+        async function fetchData() {
+            try {
+                // Sesuai dengan port Flask kita (5000)
+                const response = await fetch('http://127.0.0.1:5000/api/traffic');
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    document.getElementById('tanggal-update').innerText = "Terakhir diperbarui: " + new Date().toLocaleTimeString();
+                    rawDataForExcel = result.data;
+                    processAndDraw(result.data);
+                }
+            } catch (error) {
+                console.error("Gagal mengambil data dari API Python:", error);
+            }
+        }
+
+        function processAndDraw(data) {
+            const grouped = {};
+
+            data.forEach(item => {
+                const device = item.device_id;
+                const jenis = item.object; // Sesuaikan dengan API Python
+                const masuk = parseInt(item.masuk);
+                const keluar = parseInt(item.keluar);
+
+                if (!grouped[device]) {
+                    grouped[device] = {
+                        masuk: { car: 0, motorcycle: 0, bus: 0, truck: 0, total: 0 },
+                        keluar: { car: 0, motorcycle: 0, bus: 0, truck: 0, total: 0 }
+                    };
+                }
+
+                // Masukkan data ke group
+                if (grouped[device].masuk[jenis] !== undefined) {
+                    grouped[device].masuk[jenis] += masuk;
+                    grouped[device].masuk.total += masuk;
+
+                    grouped[device].keluar[jenis] += keluar;
+                    grouped[device].keluar.total += keluar;
+                }
+            });
+
+            const container = document.getElementById('charts-container');
+
+            Object.keys(grouped).forEach((deviceId) => {
+                const locationName = namaLokasiMap[deviceId] || deviceId;
+                const counts = grouped[deviceId];
+
+                // Jika card belum ada, buat baru
+                if (!charts[deviceId]) {
+                    const col = document.createElement('div');
+                    col.className = 'col-lg-6 mb-4';
+                    col.innerHTML = `
+                        <div class="card">
+                            <div class="card-header bg-dark text-white p-3">📍 ${locationName}</div>
+                            <div class="card-body">
+                                <div class="row text-center mb-3">
+                                    <div class="col-6 border-end">
+                                        <p class="stat-label">Total Masuk</p>
+                                        <p class="stat-number text-success" id="total-val-${deviceId}-masuk">0</p>
+                                    </div>
+                                    <div class="col-6">
+                                        <p class="stat-label">Total Keluar</p>
+                                        <p class="stat-number text-danger" id="total-val-${deviceId}-keluar">0</p>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-6 text-center">
+                                        <p class="small fw-bold">Grafik Masuk</p>
+                                        <canvas id="chart-${deviceId}-masuk" height="200"></canvas>
+                                    </div>
+                                    <div class="col-6 text-center">
+                                        <p class="small fw-bold">Grafik Keluar</p>
+                                        <canvas id="chart-${deviceId}-keluar" height="200"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(col);
+
+                    const createChart = (elId, color) => {
+                        return new Chart(document.getElementById(elId), {
+                            type: 'bar',
+                            data: {
+                                labels: ['Mobil', 'Motor', 'Bus', 'Truk'],
+                                datasets: [{ data: [0, 0, 0, 0], backgroundColor: color, borderRadius: 5 }]
+                            },
+                            options: {
+                                plugins: { legend: { display: false } },
+                                scales: {
+                                    y: { beginAtZero: true, ticks: { precision: 0 } },
+                                    x: { grid: { display: false } }
+                                }
+                            }
+                        });
+                    };
+
+                    charts[deviceId] = {
+                        masuk: createChart(`chart-${deviceId}-masuk`, '#198754'),
+                        keluar: createChart(`chart-${deviceId}-keluar`, '#dc3545')
+                    };
+                }
+
+                // Update Angka di Card
+                document.getElementById(`total-val-${deviceId}-masuk`).innerText = counts.masuk.total;
+                document.getElementById(`total-val-${deviceId}-keluar`).innerText = counts.keluar.total;
+
+                // Update Data Grafik (Urutan: car, motorcycle, bus, truck)
+                charts[deviceId].masuk.data.datasets[0].data = [counts.masuk.car, counts.masuk.motorcycle, counts.masuk.bus, counts.masuk.truck];
+                charts[deviceId].keluar.data.datasets[0].data = [counts.keluar.car, counts.keluar.motorcycle, counts.keluar.bus, counts.keluar.truck];
+
+                charts[deviceId].masuk.update();
+                charts[deviceId].keluar.update();
+            });
+        }
+
+        function downloadExcel() {
+            if (rawDataForExcel.length === 0) {
+                alert("Data belum tersedia!");
+                return;
+            }
+
+            const reportData = rawDataForExcel.map(item => ({
+                "Lokasi CCTV": namaLokasiMap[item.device_id] || item.device_id,
+                "Jenis Kendaraan": item.object.toUpperCase(),
+                "Jumlah Masuk": item.masuk,
+                "Jumlah Keluar": item.keluar,
+                "Total": parseInt(item.masuk) + parseInt(item.keluar),
+                "Waktu Laporan": new Date().toLocaleString('id-ID')
+            }));
+
+            const worksheet = XLSX.utils.json_to_sheet(reportData);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Laporan ATCS");
+            XLSX.writeFile(workbook, `Laporan_Trafik_DIY_${new Date().getTime()}.xlsx`);
+        }
+
+        // Jalankan fetch pertama kali
+        fetchData();
+        // Refresh data setiap 3 detik
+        setInterval(fetchData, 3000);
+    </script>
+</body>
+
+</html>
