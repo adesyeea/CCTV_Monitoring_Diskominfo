@@ -21,7 +21,7 @@ PRINT_LOCK = Lock()
 CCTV_NAME = "PRAMBANAN"
 CCTV_URL = "https://cctv.jogjaprov.go.id/cctv-proxy/atcs/Prambanan_TC.stream/playlist.m3u8"
 
-# Area (Sesuai koordinatmu)
+# Area 
 AREA_MASUK = np.array([(623,73),(628,182),(356,169),(428,48)], np.int32)
 AREA_KELUAR = np.array([(619,193),(632,354),(48,352),(62,165)], np.int32)
 
@@ -42,13 +42,10 @@ def process_cctv():
             cap = cv2.VideoCapture(CCTV_URL); continue
 
         frame_idx += 1
-        # Skip frame (Ambil 1 tiap 4 frame) biar gak lag tapi motor gak lolos
         if frame_idx % 4 != 0: continue
 
         frame = cv2.resize(frame, (640, 360))
 
-        # Deteksi dengan imgsz=640 agar klasifikasi motor vs mobil TAJAM
-        # Menggunakan classes=[2,3,5,7] langsung di model
         results = model.predict(frame, conf=0.2, iou=0.5, imgsz=640, classes=[2, 3, 5, 7], verbose=False, stream=True)
 
         # Gambar Area
@@ -62,7 +59,7 @@ def process_cctv():
                 
                 x1, y1, x2, y2 = map(int, box.xyxy[0])
                 
-                # SENSOR: Titik ban (Tengah Bawah) -> Lebih Akurat buat Motor
+                # SENSOR: Titik ban (Tengah Bawah)
                 cx = (x1 + x2) // 2
                 cy = y2 
 

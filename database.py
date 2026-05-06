@@ -46,7 +46,7 @@ def save_to_db(object_name, direction, device):
         )
 
         cursor.execute(query, values)
-        db.commit()  # ✅ commit manual (lebih aman)
+        db.commit()  
 
     except mysql.connector.Error as err:
         print(f"Database Error: {err}")

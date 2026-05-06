@@ -1089,7 +1089,6 @@
             flex-shrink: 0;
         }
 
-        /* KETERANGAN per menit line chart khusus */
         .menit-note {
             font-size: 0.68rem;
             color: var(--muted);
@@ -1276,7 +1275,6 @@
                     <div style="font-size:1.05rem;font-weight:700;color:var(--text);">Data Kendaraan &mdash; Prambanan
                     </div>
                 </div>
-                <!-- Filter tanggal hanya tampil di tab Harian -->
                 <div id="filter-date-wrap" style="display:flex;align-items:center;gap:10px;">
                     <label
                         style="font-size:0.72rem;font-weight:600;color:var(--muted2);text-transform:uppercase;letter-spacing:0.08em;">Tanggal</label>
@@ -1291,7 +1289,7 @@
                 <button class="tab-btn" onclick="switchTab('rentang', this)">Rentang</button>
             </div>
 
-            <!-- ==================== TAB PER JAM ==================== -->
+            <!-- TAB PER JAM -->
             <div id="tab-perjam" class="tab-panel">
 
                 <div class="filter-bar">
@@ -1317,7 +1315,7 @@
                     </div>
                 </div>
 
-                <!-- Info rentang yang dipilih -->
+                <!-- rentang yang dipilih -->
                 <div id="perjam-info-bar"
                     style="background:var(--red-light);border:1px solid var(--red-border);border-radius:8px;padding:10px 16px;margin-bottom:14px;display:flex;align-items:center;gap:10px;font-size:0.76rem;">
                     <span style="color:var(--red);font-weight:700;font-family:'Space Mono',monospace;"
@@ -1448,7 +1446,7 @@
 
             </div>
 
-            <!-- ==================== TAB HARIAN ==================== -->
+            <!--  TAB HARIAN -->
             <div id="tab-harian" class="tab-panel active">
 
                 <div style="display:flex;justify-content:flex-end;margin-bottom:14px;">
@@ -1598,7 +1596,7 @@
 
             </div>
 
-            <!-- ==================== TAB MINGGUAN (maks 7 hari) ==================== -->
+            <!--  TAB MINGGUAN  -->
             <div id="tab-mingguan" class="tab-panel">
 
                 <div class="filter-bar">
@@ -1908,9 +1906,7 @@
             }
         }
 
-        // ============================================================
         // TAB PER JAM
-        // ============================================================
         let currentGranularitas = 'jam';
         let lastPerjamRawData = [];
 
@@ -1979,17 +1975,13 @@
             const totalK = hourlyK.reduce((a, b) => a + b, 0);
             const total = totalM + totalK;
 
-            // KPI
             animNum('kpi-pj-masuk', totalM);
             animNum('kpi-pj-keluar', totalK);
             setText('kpi-pj-masuk-sub', `${from}:00 – ${to}:00 | ${hoursRange.length} jam`);
             setText('kpi-pj-keluar-sub', `${((totalK / Math.max(total, 1)) * 100).toFixed(1)}% dari total lalu lintas`);
-
-            // Info bar
             setText('perjam-range-label', `${padZ(from)}:00 – ${padZ(to)}:00 · ${date}`);
             setText('perjam-gran-label', gran === 'jam' ? `Resolusi per Jam (${hoursRange.length} titik data)` : `Resolusi per Menit (${hoursRange.length * 60} titik data)`);
 
-            // Vehicle breakdown
             const veh = { car_m: 0, car_k: 0, motorcycle_m: 0, motorcycle_k: 0, bus_m: 0, bus_k: 0, truck_m: 0, truck_k: 0 };
             filtered.forEach(d => {
                 if (veh[d.object + '_m'] !== undefined) {
@@ -2030,7 +2022,7 @@
                 drawPerjamLine(labels, hourlyTot, hourlyM, hourlyK);
                 drawPerjamInOut(labels, hourlyM, hourlyK);
             } else {
-                // CHART PER MENIT (interpolasi dari per-jam)
+                // CHART PER MENIT
                 const minuteLabels = [], minuteTot = [], minuteM = [], minuteK = [];
                 hoursRange.forEach((h, i) => {
                     const perMinTot = hourlyTot[i] / 60;
@@ -2125,9 +2117,7 @@
             });
         }
 
-        // ============================================================
         // HEATMAP
-        // ============================================================
         function initHeatmap() {
             const grid = document.getElementById('hm-grid');
             const lbls = document.getElementById('hm-lbls');
@@ -2229,9 +2219,7 @@
         const dateEl = document.getElementById('filter-date');
         if (dateEl) dateEl.valueAsDate = new Date();
 
-        // ============================================================
         // DAILY DATA
-        // ============================================================
         let lastDayRawData = [];
 
         async function fetchDayData() {
@@ -2282,9 +2270,7 @@
             drawBar(veh);
         }
 
-        // ============================================================
-        // MINGGUAN (max 7 hari)
-        // ============================================================
+        // MINGGUAN
         let lastWeekRawData = [];
         const MAX_WEEK_DAYS = 7;
 
@@ -2304,13 +2290,11 @@
 
             if (isNaN(fromDate) || isNaN(toDate)) return;
 
-            // Enforce max 7 days
             const diffDays = Math.round((toDate - fromDate) / (1000 * 60 * 60 * 24)) + 1;
             const warnEl = document.getElementById('week-warn');
 
             if (diffDays > MAX_WEEK_DAYS) {
                 warnEl.style.display = 'inline-flex';
-                // Clamp: adjust "to" date to max 7 days from "from"
                 const clampedTo = new Date(fromDate);
                 clampedTo.setDate(fromDate.getDate() + MAX_WEEK_DAYS - 1);
                 toEl.value = clampedTo.toISOString().split('T')[0];
@@ -2384,9 +2368,7 @@
             updateWeekHeatmap(total, labels);
         }
 
-        // ============================================================
-        // TAB RENTANG (bebas, top 5 hari tersibuk)
-        // ============================================================
+        // TAB RENTANG 
         let lastRentangRawData = [];
 
         function initRentangDates() {
@@ -2460,9 +2442,7 @@
             updateDynHeatmap(total, labels, 'rentang-hm-grid');
         }
 
-        // ============================================================
         // EXPORT CSV
-        // ============================================================
         function exportCSV(mode) {
             let rows = [], filename = '';
 
@@ -2554,10 +2534,8 @@
             a.href = url; a.download = filename; a.click();
             URL.revokeObjectURL(url);
         }
-
-        // ============================================================
+    
         // CHART FUNCTIONS
-        // ============================================================
         function updatePeakList(hourly) {
             const sorted = hourly.map((v, h) => ({ h, v })).sort((a, b) => b.v - a.v).slice(0, 5);
             const max = sorted[0]?.v || 1;
@@ -2730,9 +2708,7 @@
             });
         }
 
-        // ============================================================
         // INIT
-        // ============================================================
         initHeatmap();
         initPerjamSelects();
         initWeekDates();
