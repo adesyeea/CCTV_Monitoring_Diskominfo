@@ -1,13 +1,15 @@
 from flask import Flask, render_template, jsonify, request
 from flask_cors import CORS
 from database import connect_db
+import os 
 
 app = Flask(__name__)
 CORS(app)
 
 @app.route('/')
-def home():
-    return render_template('home.html')
+@app.route('/dashboard')
+def dashboard():
+    return render_template('dashboard.html')
 
 @app.route('/cctv')
 def cctv():
@@ -80,6 +82,10 @@ def get_traffic_data():
             cursor.close()
         if db and db.is_connected():
             db.close()
+
+print("Current folder:", os.getcwd())
+print("Templates folder ada:", os.path.exists("templates"))
+print("Dashboard file ada:", os.path.exists("templates/dashboard.html"))
 
 
 if __name__ == '__main__':
